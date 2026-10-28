@@ -46,3 +46,18 @@ Callable with nothing known:
 | Use the ID as given, not the corrected spelling | Inference | Call `MonitoringLocalAuthority` with both spellings |
 | `singlela` ("sub domain test"), `CambridgeCity`, `Cambridgeshire` ("Demo group for tender") are suspect | Judgment | Call them: do they return any sites? |
 | Missing values are empty strings (`"@WebsiteURL": ""`) | Fact | Parse `""` to `None` at the boundary |
+
+## Level 0 responses (checked 2026-10-28)
+
+| Endpoint | Status | Fields that match a parameter name |
+|---|---|---|
+| `Information/Groups` | OK | `@GroupName` |
+| `Information/Species` | OK | `@SpeciesCode`, `@SpeciesName` |
+| `Hourly/Map` | OK | `@SpeciesCode`, `@SpeciesName` (also `@StartDate`, `@EndDate`) |
+| `Information/AirPollutionGuide` | OK | none (guide articles) |
+| `Information/IndexHealthAdvice` | **HTTP 400**, HTML "Request Error" page | — |
+| `Information/Objective` | **HTTP 400**, HTML "Request Error" page | — |
+
+- Two documented endpoints are broken. **Fact.** `fetch` must treat a non-JSON / error response as a failure, not data.
+- The error pages start with a UTF-8 BOM, which is why parsing them as JSON fails with a BOM error rather than a clear "not JSON". **Fact.**
+- `SiteCode` and `LocalAuthorityId` come from no Level 0 endpoint; they need a `GroupName` first (Level 1). **Inference**, to confirm by calling.
