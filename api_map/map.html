@@ -1,0 +1,89 @@
+<!doctype html><html><body><pre class="mermaid">flowchart-elk LR
+  classDef nodata fill:#eeeeee,stroke:#999999,color:#666666
+  subgraph R0["Round 0"]
+    E21["Hourly/Map"]
+    E21 --> E21F["@EndDate | @EventWarningText | @EventWarningTitle | @MeasurementDate<br/>@MeasurementDateLong | @SpeciesCode | @SpeciesName | @StartDate<br/>@TimeToLive"]
+    E25["Information/AirPollutionGuide"]
+    E25 --> E25F["@AnnualItem | @ItemAdded | @ItemCategory | @ItemEnd<br/>@ItemId | @ItemKeywords | @ItemRank | @ItemStart<br/>@ItemSummary | @ItemTitle | @ItemTitleShort | @ItemURL<br/>@ItemUpdated | @ItemVideo | @MajorTopic | @PriorityBoostUntil"]
+    E26["Information/Groups"]
+    E26 --> E26F["@Description | @GroupName | @WebsiteURL"]
+    E28["Information/IndexHealthAdvice"]
+    E33["Information/Objective"]
+    E34["Information/Species"]
+    E34 --> E34F["@Description | @HealthEffect | @Link | @SpeciesCode<br/>@SpeciesName"]
+  end
+  subgraph R1["Round 1"]
+    E0["Annual/MonitoringObjective/GroupName={GroupName}"]
+    E0 --> E0F["@Achieved | @DataManager | @DataOwner | @Latitude<br/>@LatitudeWGS84 | @Longitude | @LongitudeWGS84 | @ObjectiveName<br/>@SiteCode | @SiteLink | @SiteName | @SiteType<br/>@SpeciesCode | @SpeciesDescription | @Value | @Year"]
+    E1["Annual/MonitoringObjective/GroupName={GroupName}/Year={Year}"]
+    E1 --> E1F["@Achieved | @DataManager | @DataOwner | @Latitude<br/>@LatitudeWGS84 | @Longitude | @LongitudeWGS84 | @ObjectiveName<br/>@SiteCode | @SiteLink | @SiteName | @SiteType<br/>@SpeciesCode | @SpeciesDescription | @Value | @Year"]
+    E7["Annualiser/Sites/year={year}/species={species}"]
+    E7 --> E7F["@SiteCode | @SiteName"]
+    E8["Daily/MonitoringIndex/GroupName={GroupName}/Date={Date}"]
+    E8 --> E8F["@AirQualityBand | @AirQualityIndex | @BulletinDate | @GroupName<br/>@IndexSource | @LaCentreLatitude | @LaCentreLatitudeWGS84 | @LaCentreLongitude<br/>@LaCentreLongitudeWGS84 | @Latitude | @LatitudeWGS84 | @LocalAuthorityCode<br/>@LocalAuthorityName | @Longitude | @LongitudeWGS84 | @MonitoringIndexDate<br/>@SiteCode | @SiteName | @SiteType | @SpeciesCode<br/>@SpeciesDescription | @TimeToLive"]
+    E9["Daily/MonitoringIndex/Latest/GroupName={GroupName}"]
+    E9 --> E9F["@AirQualityBand | @AirQualityIndex | @BulletinDate | @GroupName<br/>@IndexSource | @LaCentreLatitude | @LaCentreLatitudeWGS84 | @LaCentreLongitude<br/>@LaCentreLongitudeWGS84 | @Latitude | @LatitudeWGS84 | @LocalAuthorityCode<br/>@LocalAuthorityName | @Longitude | @LongitudeWGS84 | @MonitoringIndexDate<br/>@SiteCode | @SiteName | @SiteType | @SpeciesCode<br/>@SpeciesDescription | @TimeToLive"]
+    E22["Hourly/Map/SpeciesName={SpeciesName}"]
+    E23["Hourly/MonitoringIndex/GroupName={GroupName}"]
+    E23 --> E23F["@AirQualityBand | @AirQualityIndex | @BulletinDate | @GroupName<br/>@IndexSource | @LaCentreLatitude | @LaCentreLatitudeWGS84 | @LaCentreLongitude<br/>@LaCentreLongitudeWGS84 | @Latitude | @LatitudeWGS84 | @LocalAuthorityCode<br/>@LocalAuthorityName | @Longitude | @LongitudeWGS84 | @OwnerID<br/>@SiteCode | @SiteName | @SiteType | @SpeciesCode<br/>@SpeciesDescription | @TimeToLive"]
+    E29["Information/MonitoringLocalAuthority/GroupName={GroupName}"]
+    E29 --> E29F["@ContractClosed | @DateContractClosed | @HomeURL | @LaCentreLatitude<br/>@LaCentreLatitudeWGS84 | @LaCentreLongitude | @LaCentreLongitudeWGS84 | @LocalAuthorityCode<br/>@LocalAuthorityName"]
+    E30["Information/MonitoringSites/GroupName={GroupName}"]
+    E30 --> E30F["@DataManager | @DataOwner | @DateClosed | @DateOpened<br/>@DisplayOffsetX | @DisplayOffsetY | @Latitude | @LatitudeWGS84<br/>@LocalAuthorityCode | @LocalAuthorityName | @Longitude | @LongitudeWGS84<br/>@SiteCode | @SiteLink | @SiteName | @SiteType"]
+    E31["Information/MonitoringSiteSpecies/GroupName={GroupName}"]
+    E31 --> E31F["@DataManager | @DataOwner | @DateClosed | @DateMeasurementFinished<br/>@DateMeasurementStarted | @DateOpened | @Latitude | @LatitudeWGS84<br/>@LocalAuthorityCode | @LocalAuthorityName | @Longitude | @LongitudeWGS84<br/>@SiteCode | @SiteLink | @SiteName | @SiteType<br/>@SpeciesCode | @SpeciesDescription"]
+    E35["Information/Species/SpeciesCode={SpeciesCode}"]
+    E35 --> E35F["@Description | @HealthEffect | @Link | @SpeciesCode<br/>@SpeciesName"]
+  end
+  subgraph R2["Round 2"]
+    E2["Annual/MonitoringObjective/LocalAuthorityId={LocalAuthorityId}/Year={Year}"]
+    E3["Annual/MonitoringObjective/SiteCode={SiteCode}/StartDate={StartDate}"]
+    E4["Annual/MonitoringObjective/SiteCode={SiteCode}/Year={Year}"]
+    E4 --> E4F["@Achieved | @DataManager | @DataOwner | @Latitude<br/>@LatitudeWGS84 | @Longitude | @LongitudeWGS84 | @ObjectiveName<br/>@SiteCode | @SiteLink | @SiteName | @SiteType<br/>@SpeciesCode | @SpeciesDescription | @Value | @Year"]
+    E5["Annual/MonitoringReport/SiteCode={SiteCode}/Year={Year}"]
+    E5 --> E5F["@Annual | @Month1 | @Month10 | @Month11<br/>@Month12 | @Month2 | @Month3 | @Month4<br/>@Month5 | @Month6 | @Month7 | @Month8<br/>@Month9 | @ReportItem | @ReportItemName | @SpeciesCode"]
+    E10["Daily/MonitoringIndex/Latest/LocalAuthorityId={LocalAuthorityId}"]
+    E11["Daily/MonitoringIndex/Latest/SiteCode={SiteCode}"]
+    E11 --> E11F["@AirQualityBand | @AirQualityIndex | @BulletinDate | @IndexSource<br/>@LaCentreLatitude | @LaCentreLatitudeWGS84 | @LaCentreLongitude | @LaCentreLongitudeWGS84<br/>@Latitude | @LatitudeWGS84 | @LocalAuthorityCode | @LocalAuthorityName<br/>@Longitude | @LongitudeWGS84 | @MonitoringIndexDate | @SiteCode<br/>@SiteName | @SiteType | @SpeciesCode | @SpeciesDescription<br/>@TimeToLive"]
+    E12["Daily/MonitoringIndex/LocalAuthorityId={LocalAuthorityId}/Date={Date}"]
+    E13["Daily/MonitoringIndex/SiteCode={SiteCode}/Date={Date}"]
+    E13 --> E13F["@AirQualityBand | @AirQualityIndex | @BulletinDate | @IndexSource<br/>@LaCentreLatitude | @LaCentreLatitudeWGS84 | @LaCentreLongitude | @LaCentreLongitudeWGS84<br/>@Latitude | @LatitudeWGS84 | @LocalAuthorityCode | @LocalAuthorityName<br/>@Longitude | @LongitudeWGS84 | @MonitoringIndexDate | @SiteCode<br/>@SiteName | @SiteType | @SpeciesCode | @SpeciesDescription<br/>@TimeToLive"]
+    E15["Data/Site/SiteCode={SiteCode}/StartDate={StartDate}/EndDate={EndDate}"]
+    E15 --> E15F["@MeasurementDateGMT | @SiteCode | @SpeciesCode | @Value"]
+    E16["Data/SiteSpecies/SiteCode={SiteCode}/SpeciesCode={SpeciesCode}/StartDate={StartDate}/EndDate={EndDate}"]
+    E16 --> E16F["@MeasurementDateGMT | @SiteCode | @SpeciesCode | @Value"]
+    E19["Data/Traffic/Site/SiteCode={SiteCode}/StartDate={StartDate}/EndDate={EndDate}"]
+    E19 --> E19F["@ColumnId | @ColumnName | @Data1 | @Data2<br/>@Data3 | @Data4 | @Data5 | @Data6<br/>@DateTime"]
+    E20["Data/Wide/Site/SiteCode={SiteCode}/StartDate={StartDate}/EndDate={EndDate}"]
+    E20 --> E20F["@ColumnId | @ColumnName | @Data1 | @Data2<br/>@Data3 | @Data4 | @Data5 | @MeasurementDateGMT"]
+    E24["Hourly/MonitoringIndex/SiteCode={SiteCode}"]
+    E24 --> E24F["@AirQualityBand | @AirQualityIndex | @BulletinDate | @IndexSource<br/>@LaCentreLatitude | @LaCentreLatitudeWGS84 | @LaCentreLongitude | @LaCentreLongitudeWGS84<br/>@Latitude | @LatitudeWGS84 | @LocalAuthorityCode | @LocalAuthorityName<br/>@Longitude | @LongitudeWGS84 | @SiteCode | @SiteName<br/>@SiteType | @SpeciesCode | @SpeciesName | @TimeToLive"]
+    E27["Information/IndexHealthAdvice/AirQualityIndex={AirQualityIndex}"]
+    E27 --> E27F["@Advice | @AirQualityBand | @LowerAirQualityIndex | @Population<br/>@UpperAirQualityIndex"]
+  end
+  subgraph Never["Never called"]
+    E6["Annualiser/Calculate/year={year}/site={site}/backA={backA}/backB={backB}/backC={backC}/backD={backD}/species={species}/mean={mean}"]
+    E14["Data/DiffusionTube/code={code}/montype={montype}"]
+    E17["Data/SiteSpecies/SiteCode={SiteCode}/SpeciesCode={SpeciesCode}/StartDate={StartDate}/EndDate={EndDate}/Period={Period}/Units={Units}/Step={Step}"]
+    E18["Data/SiteSpeciesIndexDays/SiteCode={SiteCode}/SpeciesCode={SpeciesCode}/Period={Period}"]
+    E32["Information/News/Skip={skip}/limit={limit}"]
+  end
+  E0F --> P_SpeciesCode((SpeciesCode))
+  P_SpeciesCode --> E16 & E17 & E18 & E35
+  E0F --> P_species((species))
+  P_species --> E6 & E7
+  E34F --> P_SpeciesName((SpeciesName))
+  P_SpeciesName --> E22
+  E26F --> P_GroupName((GroupName))
+  P_GroupName --> E0 & E1 & E8 & E9 & E23 & E29 & E30 & E31
+  E30F --> P_SiteCode((SiteCode))
+  P_SiteCode --> E3 & E4 & E5 & E11 & E13 & E15 & E16 & E17 & E18 & E19 & E20 & E24
+  E30F --> P_site((site))
+  P_site --> E6
+  E8F --> P_LocalAuthorityId((LocalAuthorityId))
+  P_LocalAuthorityId --> E2 & E10 & E12
+  E23F --> P_AirQualityIndex((AirQualityIndex))
+  P_AirQualityIndex --> E27
+  class E2,E3,E6,E10,E12,E14,E17,E18,E22,E28,E32,E33 nodata</pre>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad: true});</script></body></html>
