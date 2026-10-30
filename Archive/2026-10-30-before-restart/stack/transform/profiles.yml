@@ -1,0 +1,7 @@
+air:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: ../air.duckdb      # the same file dlt loads into
+      schema: clean            # raw.* is dlt's, clean.* is dbt's

@@ -1,0 +1,6 @@
+.venv/
+air.duckdb
+*.wal
+transform/target/
+transform/logs/
+logs/

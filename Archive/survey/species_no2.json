@@ -1,0 +1,11 @@
+{
+    "AirQualitySpecies": {
+        "Species": {
+            "@SpeciesCode": "NO2",
+            "@SpeciesName": "Nitrogen Dioxide",
+            "@Description": "Nitrogen oxides are formed during high temperature combustion processes from the oxidation of nitrogen in the air or fuel.",
+            "@HealthEffect": "Nitrogen Dioxide has several health impacts and includes general irritation to the eyes, irritation of the respiratory system and shortness of breath.",
+            "@Link": "http://www.londonair.org.uk/LondonAir/guide/WhatIsNO2.aspx"
+        }
+    }
+}

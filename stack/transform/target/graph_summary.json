@@ -1,0 +1,183 @@
+{
+    "_invocation_id": "0a6d78bc-bf76-4fd6-94cd-d657bff9bf31",
+    "linked": {
+        "0": {
+            "name": "source.air.raw.sites",
+            "type": "source",
+            "succ": [
+                7
+            ]
+        },
+        "1": {
+            "name": "source.air.raw.readings",
+            "type": "source",
+            "succ": [
+                2,
+                3
+            ]
+        },
+        "2": {
+            "name": "test.air.readings_nothing_lost_in_cleaning",
+            "type": "test"
+        },
+        "3": {
+            "name": "model.air.readings",
+            "type": "model",
+            "succ": [
+                2,
+                4,
+                5,
+                8,
+                9,
+                10,
+                11,
+                12
+            ]
+        },
+        "4": {
+            "name": "test.air.readings_on_the_hour",
+            "type": "test"
+        },
+        "5": {
+            "name": "test.air.readings_one_row_per_hour",
+            "type": "test"
+        },
+        "6": {
+            "name": "test.air.sites_closed_after_opened",
+            "type": "test"
+        },
+        "7": {
+            "name": "model.air.sites",
+            "type": "model",
+            "succ": [
+                6,
+                10,
+                13,
+                14,
+                15
+            ]
+        },
+        "8": {
+            "name": "test.air.readings_plausible_values",
+            "type": "test"
+        },
+        "9": {
+            "name": "test.air.not_null_readings_site_code.bd3bc1592a",
+            "type": "test"
+        },
+        "10": {
+            "name": "test.air.relationships_readings_site_code__site_code__ref_sites_.7348ca61c4",
+            "type": "test"
+        },
+        "11": {
+            "name": "test.air.accepted_values_readings_species_code__NO2.1a437fc581",
+            "type": "test"
+        },
+        "12": {
+            "name": "test.air.not_null_readings_measured_at.fb4631a065",
+            "type": "test"
+        },
+        "13": {
+            "name": "test.air.unique_sites_site_code.b6edf4c52f",
+            "type": "test"
+        },
+        "14": {
+            "name": "test.air.not_null_sites_site_code.2f375344a4",
+            "type": "test"
+        },
+        "15": {
+            "name": "test.air.not_null_sites_site_name.f66f55fdf2",
+            "type": "test"
+        }
+    },
+    "with_test_edges": {
+        "0": {
+            "name": "source.air.raw.sites",
+            "type": "source",
+            "succ": [
+                7
+            ]
+        },
+        "1": {
+            "name": "source.air.raw.readings",
+            "type": "source",
+            "succ": [
+                2,
+                3
+            ]
+        },
+        "2": {
+            "name": "test.air.readings_nothing_lost_in_cleaning",
+            "type": "test"
+        },
+        "3": {
+            "name": "model.air.readings",
+            "type": "model",
+            "succ": [
+                2,
+                4,
+                5,
+                8,
+                9,
+                10,
+                11,
+                12
+            ]
+        },
+        "4": {
+            "name": "test.air.readings_on_the_hour",
+            "type": "test"
+        },
+        "5": {
+            "name": "test.air.readings_one_row_per_hour",
+            "type": "test"
+        },
+        "6": {
+            "name": "test.air.sites_closed_after_opened",
+            "type": "test"
+        },
+        "7": {
+            "name": "model.air.sites",
+            "type": "model",
+            "succ": [
+                6,
+                10,
+                13,
+                14,
+                15
+            ]
+        },
+        "8": {
+            "name": "test.air.readings_plausible_values",
+            "type": "test"
+        },
+        "9": {
+            "name": "test.air.not_null_readings_site_code.bd3bc1592a",
+            "type": "test"
+        },
+        "10": {
+            "name": "test.air.relationships_readings_site_code__site_code__ref_sites_.7348ca61c4",
+            "type": "test"
+        },
+        "11": {
+            "name": "test.air.accepted_values_readings_species_code__NO2.1a437fc581",
+            "type": "test"
+        },
+        "12": {
+            "name": "test.air.not_null_readings_measured_at.fb4631a065",
+            "type": "test"
+        },
+        "13": {
+            "name": "test.air.unique_sites_site_code.b6edf4c52f",
+            "type": "test"
+        },
+        "14": {
+            "name": "test.air.not_null_sites_site_code.2f375344a4",
+            "type": "test"
+        },
+        "15": {
+            "name": "test.air.not_null_sites_site_name.f66f55fdf2",
+            "type": "test"
+        }
+    }
+}

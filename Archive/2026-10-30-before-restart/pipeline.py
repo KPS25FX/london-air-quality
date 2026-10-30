@@ -28,15 +28,28 @@ def CallApi(Path):
     with urllib.request.urlopen(API_BASE + Path, timeout=60) as Response:
         return json.loads(Response.read())
 
+# Returns the web response as a python dict 
+
+
 
 def AsList(Value):
     """The API returns one item as a dict and several as a list. Always give back a list."""
+    # Why: the API converts XML to JSON, so a repeated element like <Site> comes back as either
+    #   several -> [{"@SiteCode": "MY1", ...}, {"@SiteCode": "GT1", ...}]
+    #   one     ->  {"@SiteCode": "MY1", ...}
+    # Looping over a list gives each element (a whole site dict), which is what we want.
+    # Looping over a dict gives its KEYS ("@SiteCode", "@SiteName", ...), so Site["@SiteCode"]
+    # would then fail with "TypeError: string indices must be integers".
+    # Wrapping a lone dict in [ ] means the loop always gets site dicts.
     return Value if isinstance(Value, list) else [Value]
 
 
 def GetSites(Group):
     Data = CallApi(f"/Information/MonitoringSiteSpecies/GroupName={Group}/Json")
     Rows = []
+    # For each site, build a new dict that keeps only the fields we want and drops the "@"
+    # (e.g. "SiteCode" = the value of Site["@SiteCode"]). Keys not named here, like the
+    # nested "Species" list, are left out.
     for Site in AsList(Data["Sites"]["Site"]):
         Rows.append({"SiteCode": Site["@SiteCode"],
                      "SiteName": Site["@SiteName"],
@@ -44,12 +57,26 @@ def GetSites(Group):
                      "Latitude": Site["@Latitude"],
                      "Longitude": Site["@Longitude"],
                      "DateClosed": Site["@DateClosed"]})
+    # A list of dicts becomes a table: each dict is one row, and its keys become the
+    # column names. All values are still text at this point.
     return pandas.DataFrame(Rows)
 
 
 def GetReadings(Site, Species, Start, End):
     Data = CallApi(f"/Data/SiteSpecies/SiteCode={Site}/SpeciesCode={Species}"
                    f"/StartDate={Start}/EndDate={End}/Json")
+    # What comes back (real sample, MY1 / NO2, one day):
+    #   {"RawAQData": {
+    #       "@SiteCode": "MY1",
+    #       "@SpeciesCode": "NO2",
+    #       "Data": [                                                    # one dict per hour
+    #           {"@MeasurementDateGMT": "2026-10-28 00:00:00", "@Value": ""},     # "" = no reading
+    #           {"@MeasurementDateGMT": "2026-10-28 01:00:00", "@Value": "36.1"},
+    #           ...
+    #       ]}}
+    # Data["RawAQData"]           -> the inner dict
+    # .get("Data", [])            -> its "Data" list; if the key is missing (no readings), [] instead of a KeyError
+    # AsList(...)                 -> a single hour comes back as a dict, not a list (see AsList)
     Rows = []
     for Hour in AsList(Data["RawAQData"].get("Data", [])):        # one entry per hour
         Rows.append({"SiteCode": Site,
