@@ -14,7 +14,8 @@ advise them.
    Along the way it names the API's quirks and handles each one in one place.
 2. **A pipeline** ([pipeline.py](pipeline.py)) that fetches the last 7 days of hourly NO₂ for two sites into DuckDB.
    Every run adds new hours, updates hours already stored, never duplicates, records any value that changed, and logs
-   itself. It stops with an error rather than store a request that silently returned nothing.
+   itself. It uses the notebook's rules and checks, and stops with an error rather than store a request that silently
+   returned nothing.
 3. **A comparison of the two sites** (end of [Presentation.ipynb](Presentation.ipynb)):
    - **Marylebone Road (MY1):** kerbside
    - **Station Walk (GT1):** urban background
@@ -57,7 +58,7 @@ flowchart TD
     end
 
     subgraph Pipeline["Pipeline · pipeline.py"]
-        Readings["Readings DataFrame · 168 rows per site per week<br/>@MeasurementDateGMT, @Value,<br/>SiteCode, SpeciesCode, StartDate, EndDate"]
+        Readings["Readings DataFrame · up to 168 rows per site per week<br/>SiteCode, SpeciesCode, MeasurementDateGMT, Value"]
         DBSites[("sites · DuckDB<br/>the London site list, refreshed every run")]
         DBReadings[("readings · DuckDB<br/>one row per site, species and hour")]
         DBChanges[("changes · DuckDB<br/>RunAt, the hour, OldValue, NewValue")]
@@ -76,6 +77,7 @@ flowchart TD
     Groups -- "GroupName = London<br/>Information/MonitoringSiteSpecies" --> Pairs
     Sites -- "reveals SiteCode = MY1, GT1" --> Readings
     Species -- "reveals SpeciesCode = NO2<br/>GetReadings · Data/SiteSpecies" --> Readings
+    Pairs -- "each pair must be listed" --> Readings
     Sites -- "the same list, each run" --> DBSites
     Readings -- "SaveReadings: insert new hours,<br/>update existing ones" --> DBReadings
     Readings -- "SaveReadings: value differs<br/>from what was stored" --> DBChanges
@@ -90,7 +92,7 @@ flowchart TD
 |---|---|---|
 | **Extract:** how the endpoints connect | [Presentation.ipynb](Presentation.ipynb) | The help page becomes a table of endpoints, and `ParametersOf` reads the parameters each one needs. Discovery then starts knowing nothing: call every endpoint whose parameters are all known (`CallableWith`), and see which parameters each reply gives values for (`Reveals`: a column named like a parameter). Repeat. Two rounds reach the readings: Groups gives GroupName, MonitoringSites gives SiteCode, Species gives SpeciesCode, and those three unlock `Data/SiteSpecies`. |
 | **Collect history** | `pipeline.py`: `SaveReadings` | The `readings` table's primary key is site + species + hour, so each hour is stored once. A new hour is inserted. An hour we already have is updated (`ON CONFLICT … DO UPDATE`), which picks up late and corrected values. Before updating, any value that differs is written to `changes` with its old and new value. Each run re-fetches the last 7 days and adds a row to `runs`. |
-| **Shape** | the `readings` and `sites` tables | Text from the API becomes a timestamp and a number by the table's column types. `""` becomes NULL (`NULLIF`). The primary key says what one row is. `sites` joins to `readings` on the site code. In the notebook, `Clean` also removes the API's `@` from field names, so a field and the parameter it fills have one name. |
+| **Shape** | `Clean`, and the `readings` and `sites` tables | `Clean` removes the API's `@` from field names, so a field and the parameter it fills have one name, and turns `""` into a real missing value (NULL). The table's column types turn text into a timestamp and a number. The primary key says what one row is: one site, one species, one hour, and its value. `sites` joins to `readings` on `SiteCode`. |
 | **Use** | end of [Presentation.ipynb](Presentation.ipynb) | Mean NO₂ at the kerbside and background sites over the hours where both have a value, overall and by hour of day. |
 
 ### Guarding against bad data
@@ -101,7 +103,7 @@ through several boundaries, and each could hold a check. Each line below is one 
 options, and ✓ marks what I chose:
 
 ```
-Parameters     { nothing | format check | site is an open London site ✓ pipeline | (site, species) ∈ ValidPairs ✓ notebook | dates within Started–Finished }
+Parameters     { nothing | format check | site is an open London site | (site, species) ∈ ValidPairs ✓ | dates within Started–Finished }
       ↓
 The call       { catch everything | catch HTTPError and log it ✓ exploring | let it raise ✓ | retry }
       ↓
@@ -117,18 +119,19 @@ doesn't list, before the call. But listed doesn't mean it has data: Marylebone R
 and has had no CO since 30 Oct 2026, though CO is still listed with no end date. Only checking the reply catches
 those.
 
-The API's other quirks each live in one named place in the notebook. A quirk with a pattern becomes a rule: `Records`
-finds the records in any reply, `AsList` handles a list of one coming back as a single object, and `Clean` handles
-`@` names and `""` values. Where there is no pattern, the knowledge is written down as data: `RecordPaths` states where
-the records are for the endpoints the pipeline relies on, and the notebook checks it against the live API.
+The API's other quirks each live in one named place. A quirk with a pattern becomes a rule: `Records` finds the
+records in any reply, `AsList` handles a list of one coming back as a single object, and `Clean` handles `@` names and
+`""` values. Where there is no pattern, the knowledge is written down as data: `RecordPaths` states where the records
+are for the endpoints the pipeline relies on, and the notebook checks it against the live API. The notebook explores
+with the rule; the pipeline follows the stated paths.
 
 ### Running it again
 
 Running the pipeline twice in a row adds nothing the second time. Each run is logged in `runs`, and the
-first real runs were on 1 and 2 Nov 2026. The week before that was loaded by replaying past dates in
-[ExploreAnalyse.ipynb](ExploreAnalyse.ipynb), my first pass at this project: it moves the end date forward one day
-at a time, starting a week back. The first run adds 336 hours (2 sites × 7 days × 24 hours). Each run after that adds
-48 (1 new day × 24 hours × 2 sites) and leaves the rest as they were.
+first real runs were on 1 and 2 Nov 2026. The week before that was loaded by replaying past dates, in my first
+notebook (kept in the git history): it moved the end date forward one day at a time, starting a week back. The first
+run added 336 hours (2 sites × 7 days × 24 hours). Each run after that added 48 (1 new day × 24 hours × 2 sites) and
+left the rest as they were.
 
 A replay uses today's version of past data, so it can't show a late value arriving. Real runs a few hours apart do:
 the most recent hours are often empty at first and filled in later, and those show up in `changes`.
@@ -151,11 +154,8 @@ DuckDB lets only one program write to `air.duckdb` at a time, so close any open 
 
 - **Measure how far back values change.** The pipeline assumes nothing older than 7 days changes. Re-fetching an
   older month and comparing it with what was stored would turn that assumption into a measured number.
-- **Check pairs in the pipeline too.** The notebook checks each (site, pollutant) pair against the API's own list
-  before calling. The pipeline only checks that the site is open, and relies on the empty-reply check for the rest.
-  Storing the site × pollutant list in DuckDB would let it check pairs first.
-- **One set of names from end to end.** The notebook's tables use clean names (`SiteCode`, `Value`), but the
-  database still uses the API's (`@MeasurementDateGMT`, `@Value`).
+- **Define the rules once.** The notebook defines `Get`, `AsList`, `Follow` and `Clean` as it discovers them, and
+  `pipeline.py` repeats them. A small module both import would keep them from drifting apart.
 - **A schedule (cron) instead of running it by hand,** and a visual, interactive version of the pipeline diagram.
 - **More road / background pairs, and other pollutants,** to test whether the pattern holds across London.
 

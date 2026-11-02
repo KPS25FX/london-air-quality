@@ -61,20 +61,21 @@ Decision: catch `HTTPError` and log its code; let any other exception stop the r
 - The species list has 6 codes (CO, NO2, O3, PM10, PM25, SO2), but `Data/Wide/Site` for MY1 also reports Nitric Oxide
   and Oxides of Nitrogen.
 
-Decision: one name per thing in our tables. `JOIN sites ON SiteCode = "@SiteCode"` is the one place where the API's two
-names meet.
+Decision: one name per thing. `Clean` removes the `@` at the boundary, so a field and the parameter it fills have the
+same name, in the notebook and in the database.
 
 ## Shape and types
 
 - Every reply is wrapped twice, with different keys per endpoint: `["Groups"]["Group"]`,
-  `["AirQualitySpecies"]["Species"]`, `["Sites"]["Site"]`, `["RawAQData"]["Data"]`. Decision: pick the path per
-  endpoint, then `json_normalize`.
+  `["AirQualitySpecies"]["Species"]`, `["Sites"]["Site"]`, `["RawAQData"]["Data"]`. Decision: to explore, a rule
+  (`Records`: the root's one child that isn't an `@` attribute, which fits 23 of the 25 endpoints that answer); for the
+  endpoints we rely on, the paths written down (`RecordPaths`) and checked against the API.
 - A list with one item comes back as a single object. In `MonitoringSiteSpecies`, `Species` is a list for 196 sites and
-  a dict for 58. Decision: wrap a dict in a list before flattening.
+  a dict for 58. Decision: `AsList` wraps a dict in a list before flattening.
 - Every value is a string: numbers, dates, coordinates, even booleans (`"False"`). Decision: we declare the types
-  (DuckDB column types, Pydantic).
+  (DuckDB column types, Pydantic for the endpoint list).
 - Missing is `""`, not null: `@Value`, `@WebsiteURL`, and `@DateClosed`, where `""` means the site is still open.
-  Decision: `NULLIF(…, '')` at the boundary.
+  Decision: `Clean` turns `""` into a real missing value at the boundary.
 - `@LatitudeWGS84` and `@LongitudeWGS84` aren't degrees despite the name: they run from 6,677,126 to 6,740,432, which
   looks like Web Mercator metres. `@Latitude` and `@Longitude` are degrees (50.91 to 51.67). Decision: use `@Latitude`
   and `@Longitude`.
