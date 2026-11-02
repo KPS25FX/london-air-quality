@@ -1,2 +1,0 @@
-pydantic valdiation
-visual pipeline

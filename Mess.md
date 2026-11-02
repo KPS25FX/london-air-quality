@@ -1,12 +1,4 @@
-How do you know which permuatations of sitecode x pollutant have valid data
-If you call sitecode x pollutant for an invalid pair , you get an empty table
-What would happen if this was fed to a machine learning pipeline 
-How can we ensure that we understand the full set of valid combinations of parameters and the data that is accessible from these combinations 
-F : Valid Parameter tuples - > Tables
-
----
-
-# What the API does that we didn't expect
+# Mess: what the API does that we didn't expect
 
 Checked against the live API on 1 Nov 2026, unless a line says otherwise. Each finding says what happens and what it
 means for our code.
@@ -115,3 +107,25 @@ names meet.
 - `Hourly/Map` labels are wrong: "23:00 on Friday 31st November 2026" (there is no 31 November, and 31 July 2026 was a
   Friday), next to `@MeasurementDate` 31/07/2026 and `@StartDate` 01/11/2026. Its dates are dd/mm/yyyy, while readings
   are yyyy-mm-dd hh:mm:ss. Decision: don't use `Hourly/Map` timestamps, and parse each endpoint's date format on its own.
+
+## The questions I started with
+
+**How do you know which permutations of site code × pollutant have valid data?** The API lists them itself:
+`MonitoringSiteSpecies` gives 646 (site, species) pairs. But a listed pair can still have no data (MY1 × CO), so the
+reply has to be checked too. See Silent above.
+
+**If you call site code × pollutant for an invalid pair, you get an empty table.** Confirmed: 200, one row per hour,
+every value `""`. The same happens for a site code that doesn't exist.
+
+**What would happen if this was fed to a machine learning pipeline?** It would learn from hours that were never
+measured: as gaps if it handles missing values, or as zeros if something fills them in. Nothing would fail, so nobody
+would know. That's why the pipeline raises an error on an empty reply instead of storing it.
+
+**How can we make sure we understand the full set of valid combinations of parameters, and the data each one gives?**
+In three ways, because they are three kinds of knowing. The valid parameters come from the API's own lists
+(`ValidPairs`), before any call. Whether a combination has data is only known by calling it (the reply check). And
+whether it still has data is only known by watching over time (`runs`, `changes`, and the last measured hour per site).
+
+**F : valid parameter tuples → tables.** `GetReadings` in the notebook is this F. Its domain is `ValidPairs` (with
+dates), checked before the call. It is a partial function: some tuples in its domain still give no table, and the
+reply check is what says so.
