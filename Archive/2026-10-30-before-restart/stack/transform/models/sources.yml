@@ -1,6 +1,0 @@
-sources:
-  - name: raw                  # the tables dlt loaded, exactly as the API sent them (all text)
-    schema: raw
-    tables:
-      - name: sites
-      - name: readings

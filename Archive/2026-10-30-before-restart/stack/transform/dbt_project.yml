@@ -1,5 +1,0 @@
-name: air
-profile: air
-models:
-  air:
-    +materialized: table
